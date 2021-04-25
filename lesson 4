@@ -1,0 +1,108 @@
+SHOW TABLES;
+SELECT * FROM users;
+UPDATE users SET updated_at = NOW() WHERE updated_at < created_at; 
+DESC users;
+SELECT * FROM users;
+DESC profiles;
+SELECT * FROM profiles LIMIT 10;
+UPDATE profiles SET updated_at = NOW() WHERE updated_at < created_at; 
+CREATE TEMPORARY TABLE genders(name VARCHAR(50));
+INSERT INTO genders VALUES
+  ('F'),
+  ('M');
+UPDATE profiles SET gender = (SELECT name FROM genders ORDER BY RAND() LIMIT 1);
+ALTER TABLE profiles MODIFY COLUMN gender ENUM('M', 'F');
+CREATE TEMPORARY TABLE countries(name VARCHAR(100));
+INSERT INTO countries VALUES
+  ('Russian Fderation'),
+  ('Belarus'),
+  ('Germany'),
+  ('USA'),
+  ('England'),
+  ('Ukraine'),
+  ('France');
+  UPDATE profiles SET country = (SELECT name FROM countries ORDER BY RAND() LIMIT 1); 
+  SELECT * FROM profiles LIMIT 10;
+ DESC messages;
+ SELECT * FROM messages LIMIT 10;
+ UPDATE messages SET
+  from_user_id = FLOOR(1 + RAND() * 100),
+  to_user_id = FLOOR(1 + RAND() * 100);
+  SELECT * FROM messages LIMIT 10;
+DESC media;
+SELECT * FROM media LIMIT 10;
+UPDATE media SET updated_at = NOW() WHERE updated_at < created_at; 
+UPDATE media SET user_id = FLOOR(1 + RAND() * 100);
+CREATE TEMPORARY TABLE extensions (name VARCHAR(10));
+INSERT INTO extensions VALUES ('jpeg'), ('mp4'), ('mp3'), ('avi'), ('png');
+SELECT * FROM extensions;
+UPDATE media SET filename = CONCAT(
+  'http://dropbox.net/vk/',
+  filename,
+  '.',
+  (SELECT name FROM extensions ORDER BY RAND() LIMIT 1)
+);
+UPDATE media SET size = FLOOR(10000 + (RAND() * 1000000)) WHERE size < 1000;
+UPDATE media SET metadata = CONCAT('{"owner":"', 
+  (SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = user_id),
+  '"}'); 
+ALTER TABLE media MODIFY COLUMN metadata JSON;
+SELECT * FROM media_types; 
+UPDATE media_types SET updated_at = NOW() WHERE updated_at < created_at; 
+DELETE FROM media_types;
+INSERT INTO media_types (name) VALUES
+  ('image'),
+  ('video'),
+  ('audio');
+ INSERT INTO media_types (name) VALUES
+  ('text');
+TRUNCATE media_types;
+SELECT * FROM media LIMIT 10;
+UPDATE media SET media_type_id = FLOOR(1 + RAND() * 3);
+DESC friendship;
+SELECT * FROM friendship LIMIT 10;
+UPDATE friendship SET updated_at = NOW() WHERE updated_at < created_at; 
+REPLACE friendship SET 
+  user_id = FLOOR(1 + RAND() * 100),
+  friend_id = FLOOR(1 + RAND() * 100);
+UPDATE friendship SET friend_id = friend_id + 1 WHERE user_id = friend_id;
+SELECT * FROM friendship_statuses; 
+UPDATE friendship_statuses SET updated_at = NOW() WHERE updated_at < created_at; 
+TRUNCATE friendship_statuses;
+INSERT INTO friendship_statuses (name) VALUES
+  ('Requested'),
+  ('Confirmed'),
+  ('Rejected');
+UPDATE friendship SET friendship_status_id = FLOOR(1 + RAND() * 3); 
+DESC communities;
+SELECT * FROM communities;
+UPDATE communities SET updated_at = NOW() WHERE updated_at < created_at; 
+SELECT * FROM communities_users;
+UPDATE communities_users SET
+  user_id = FLOOR(1 + RAND() * 100),
+  community_id = FLOOR(1 + RAND() * 29);
+ 
+DROP TABLE IF EXISTS `posts`;
+
+CREATE TABLE `posts` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Идентификатор строки',
+  `from_user_id` int(10) unsigned NOT NULL COMMENT 'Ссылка на отправителя сообщения',
+  `body` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Текст сообщения',
+  `media_type_id` int(10) unsigned NOT NULL COMMENT 'Ссылка на тип контента',
+  `likes` int(10) unsigned NOT NULL COMMENT 'Ссылка на таблицу лайков',  
+  `created_at` datetime DEFAULT current_timestamp() COMMENT 'Время создания строки',
+  PRIMARY KEY (`id`)
+  )
+
+DROP TABLE IF EXISTS `likes`;
+
+CREATE TABLE `likes` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Идентификатор строки',
+  `from_user_id_count` int(10) unsigned NOT NULL COMMENT 'Ссылка на того кто проставил лайк',
+  `to_user_id_count` int(10) unsigned NOT NULL COMMENT 'Ссылка на того кому поставили лайк',
+  `created_at` datetime DEFAULT current_timestamp() COMMENT 'Время создания строки',
+   PRIMARY KEY (`id`)
+   )
+
+SELECT * FROM likes;   
+ 
