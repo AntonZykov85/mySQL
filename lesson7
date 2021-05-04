@@ -1,0 +1,30 @@
+INSERT INTO orders 
+  SELECT 
+    id, 
+    FLOOR(1 + (RAND() * 6)), 
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+  FROM users;
+
+desc users;
+SELECT * from users;
+
+SELECT 
+	u.id AS user_id, u.name,
+	o.id AS order_id
+FROM 
+	users AS u 
+JOIN 
+	orders AS o 
+ON
+	u.id = o.user_id
+	
+DESC catalogs;
+DESC products;
+
+SELECT 
+	x.id, x.name, x.price, y.id AS CATALOG_ID,
+	y.name AS catalog
+FROM products AS x 
+JOIN catalogs AS y 
+ON x.catalog_id = y.id;
