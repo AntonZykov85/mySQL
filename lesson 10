@@ -1,0 +1,40 @@
+  ///доработал таблицу сообществ///
+  
+  UPDATE communities_users SET user_id = FLOOR(1 + (RAND() * 100));
+  UPDATE communities_users SET community_id = FLOOR(1 + (RAND() * 100));
+  
+
+CREATE INDEX users_first_name_idx ON users(first_name);
+CREATE INDEX users_last_name_idx ON users(last_name);
+CREATE INDEX users_first_last_name_idx ON users(first_name, last_name);
+
+CREATE INDEX users_gender_idx ON profiles(gender);
+CREATE INDEX users_birthday_idx ON profiles(birthday);
+CREATE INDEX users_city_idx ON profiles(city);
+CREATE INDEX users_country_idx ON profiles(country);
+CREATE INDEX users_city_country_idx ON profiles(city, country);
+
+CREATE INDEX community_name_idx ON communities(name);
+
+show index from profiles;
+
+///задание 2 ///
+
+SELECT 
+communities.name,
+COUNT(communities_users.user_id) over () / COUNT(communities_users.community_id) OVER () AS community_user_AVG,
+MAX(profiles.birthday) OVER (PARTITION BY communities_users.user_id) AS yongest_user,
+MIN(profiles.birthday) OVER (PARTITION BY communities_users.user_id) AS older_user,
+SUM(communities_users.user_id) over () AS user_count,
+COUNT(users.id) OVER () AS sum_users
+	FROM  communities_users
+	left JOIN communities
+		ON communities.id = communities_users.community_id
+	left JOIN profiles 
+		ON profiles.user_id = communities_users.community_id
+	left JOIN users
+		ON users.id = communities_users.community_id
+	left JOIN users
+		ON users.id = communities_users.user_id;
+
+
